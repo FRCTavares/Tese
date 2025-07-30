@@ -1,0 +1,27 @@
+
+# Real-Time Object Detection Pipeline - Raspberry Pi 5 Dependencies (without pyrealsense2)
+# Python >= 3.11 required
+# Note: pyrealsense2 must be installed separately via setup_realsense.sh
+
+# Core computer vision libraries
+opencv-python>=4.8.0
+numpy>=1.24.0
+
+# YOLO model for object detection (nano variant for Pi 5)
+ultralytics>=8.0.0
+
+# Inference acceleration - choose one based on preference
+onnxruntime>=1.15.0  # CPU-optimized ONNX runtime
+# Alternative: ncnn-python>=1.0.20240729  # Uncomment for NCNN backend
+
+# Utilities and development
+Pillow>=10.0.0
+matplotlib>=3.7.0
+tqdm>=4.65.0
+
+# Testing
+pytest>=7.4.0
+pytest-benchmark>=4.0.0
+
+# Optional: for model optimization and export
+onnx>=1.14.0

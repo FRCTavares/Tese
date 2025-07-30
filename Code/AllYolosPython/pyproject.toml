@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "real-time-object-detection-pi5"
+version = "1.0.0"
+description = "Real-time object detection pipeline optimized for Raspberry Pi 5 with Intel RealSense D435 camera"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Real-Time Detection Team", email = "team@example.com"}
+]
+keywords = ["object-detection", "raspberry-pi", "realsense", "yolo", "computer-vision"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "opencv-python>=4.8.0",
+    "numpy>=1.24.0",
+    "ultralytics>=8.0.0",
+    "onnxruntime>=1.15.0",
+    "Pillow>=10.0.0",
+    "matplotlib>=3.7.0",
+    "tqdm>=4.65.0",
+    "flask>=2.3.0",
+    "onnx>=1.14.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-benchmark>=4.0.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+]
+realsense = [
+    "pyrealsense2>=2.54.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/username/real-time-object-detection-pi5"
+Documentation = "https://github.com/username/real-time-object-detection-pi5/docs"
+Repository = "https://github.com/username/real-time-object-detection-pi5.git"
+Issues = "https://github.com/username/real-time-object-detection-pi5/issues"
+
+[project.scripts]
+rt-detect = "src.main:main"
+rt-web-viewer = "src.web_viewer:main"
+rt-high-perf = "src.high_performance_viewer:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

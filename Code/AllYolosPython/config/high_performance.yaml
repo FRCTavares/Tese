@@ -1,0 +1,52 @@
+# High-Performance Configuration
+# Optimized for maximum FPS on Raspberry Pi 5
+
+camera:
+  width: 424
+  height: 240
+  fps: 30
+  enable_depth: false
+  auto_exposure: false
+  exposure: 166
+  gain: 64
+
+detection:
+  model_path: "yolov8n.pt"
+  confidence_threshold: 0.6        # Higher threshold for fewer false positives
+  iou_threshold: 0.4
+  backend: "ultralytics"
+  inference_size: [320, 320]       # Smaller inference size for speed
+  max_detections: 50               # Limit detections for performance
+
+performance:
+  mode: "performance"
+  skip_frames: 1                   # Skip every other frame
+  enable_threading: true
+  buffer_size: 1                   # Minimal buffer
+
+display:
+  show_fps: true
+  show_confidence: false           # Disable confidence display for speed
+  bbox_thickness: 1                # Thinner boxes
+  font_scale: 0.4                  # Smaller font
+  enable_labels: false             # Disable labels for speed
+
+web:
+  host: "0.0.0.0"
+  port: 5000
+  jpeg_quality: 75                 # Lower quality for speed
+  stream_fps: 15
+  enable_stats: true
+
+output:
+  save_frames: false
+  save_detections: false
+
+system:
+  log_level: "WARNING"             # Reduce logging overhead
+  cpu_threads: 4
+  memory_limit: "1.5GB"
+
+# Only detect common objects for performance
+classes:
+  enabled: [0, 2, 3, 5, 7, 15, 16, 17]  # person, car, motorcycle, bus, truck, cat, dog, horse

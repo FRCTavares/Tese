@@ -1,0 +1,32 @@
+Quantized Model Information
+============================
+
+To create quantized models for better performance on Raspberry Pi:
+
+1. INT8 Quantization using ONNX Runtime:
+   - Requires calibration dataset
+   - Can improve inference speed by 2-4x
+   - Slight accuracy trade-off
+
+2. TensorRT Optimization (if using Jetson):
+   - model.export(format='engine', half=True)
+   - Optimized for NVIDIA hardware
+
+3. OpenVINO Format (Intel hardware):
+   - model.export(format='openvino', half=True)
+   - Optimized for Intel CPUs/GPUs
+
+4. TensorFlow Lite:
+   - model.export(format='tflite', int8=True)
+   - Good for mobile/edge devices
+
+Commands to create quantized models:
+-----------------------------------
+# TensorFlow Lite INT8
+python -c "from ultralytics import YOLO; YOLO('yolov8n.pt').export(format='tflite', int8=True)"
+
+# ONNX with dynamic quantization  
+python -c "import onnx; from onnxruntime.quantization import quantize_dynamic; quantize_dynamic('yolov8n.onnx', 'yolov8n_quantized.onnx')"
+
+# OpenVINO (requires Intel toolkit)
+python -c "from ultralytics import YOLO; YOLO('yolov8n.pt').export(format='openvino', half=True)"

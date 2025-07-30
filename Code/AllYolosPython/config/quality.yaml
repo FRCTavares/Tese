@@ -1,0 +1,53 @@
+# Quality Configuration
+# Optimized for best detection quality (may reduce FPS)
+
+camera:
+  width: 640
+  height: 480
+  fps: 15                          # Lower FPS for stability
+  enable_depth: false
+  auto_exposure: true              # Auto exposure for best image quality
+  exposure: 166
+  gain: 64
+
+detection:
+  model_path: "yolov8n.pt"
+  confidence_threshold: 0.3        # Lower threshold for more detections
+  iou_threshold: 0.5               # Higher IoU for better filtering
+  backend: "ultralytics"
+  inference_size: [640, 640]       # Full resolution inference
+  max_detections: 100
+
+performance:
+  mode: "quality"
+  skip_frames: 0                   # Process every frame
+  enable_threading: true
+  buffer_size: 3                   # Larger buffer for stability
+
+display:
+  show_fps: true
+  show_confidence: true
+  bbox_thickness: 3                # Thicker boxes for visibility
+  font_scale: 0.7                  # Larger font
+  enable_labels: true
+
+web:
+  host: "0.0.0.0"
+  port: 5000
+  jpeg_quality: 95                 # High quality streaming
+  stream_fps: 5                    # Lower streaming FPS
+  enable_stats: true
+
+output:
+  save_frames: true                # Save frames for analysis
+  output_dir: "/tmp/quality_output"
+  frame_format: "png"              # PNG for better quality
+  save_detections: true            # Save detection data
+
+system:
+  log_level: "INFO"
+  cpu_threads: 4
+  memory_limit: "3GB"
+
+classes:
+  enabled: []                      # Detect all classes
