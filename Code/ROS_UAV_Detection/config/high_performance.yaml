@@ -1,0 +1,25 @@
+# High performance configuration for UAV Object Detection
+# Optimized for faster inference with lower resolution
+camera_node:
+  ros__parameters:
+    width: 320
+    height: 240
+    fps: 60
+    enable_depth: false
+    publish_rate: 60.0
+
+detector_node:
+  ros__parameters:
+    model_path: "yolov8n.pt"  # Use nano model for speed
+    confidence_threshold: 0.6  # Higher threshold for fewer false positives
+    nms_threshold: 0.4
+    input_size: 416  # Smaller input size for speed
+    device: "cuda"  # Use GPU if available
+    max_detections: 50
+
+visualization_node:
+  ros__parameters:
+    display_window: true
+    save_video: false
+    video_output_path: "/tmp/detections_hp.mp4"
+    fps: 60

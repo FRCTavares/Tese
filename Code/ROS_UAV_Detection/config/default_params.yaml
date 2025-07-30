@@ -1,0 +1,24 @@
+# Default configuration for UAV Object Detection
+camera_node:
+  ros__parameters:
+    width: 480
+    height: 270
+    fps: 30
+    enable_depth: false
+    publish_rate: 30.0
+
+detector_node:
+  ros__parameters:
+    model_path: "yolov8n.pt"
+    confidence_threshold: 0.5
+    nms_threshold: 0.4
+    input_size: 640
+    device: "cpu"
+    max_detections: 100
+
+visualization_node:
+  ros__parameters:
+    display_window: true
+    save_video: false
+    video_output_path: "/tmp/detections.mp4"
+    fps: 30
