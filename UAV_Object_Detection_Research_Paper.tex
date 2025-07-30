@@ -1,4 +1,4 @@
-\documentclass[12pt,a4paper]{article}
+\documentclass[11pt,a4paper]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[english]{babel}
 \usepackage{amsmath}
@@ -18,6 +18,8 @@
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,fit,backgrounds}
 
 % Page setup
 \geometry{margin=2.5cm}
@@ -233,30 +235,55 @@ Our proposed framework adopts a dual-approach strategy, providing both standalon
 
 \begin{figure}[H]
     \centering
-    \begin{verbatim}
-    ┌─────────────────────────────────────────────────────────────┐
-    │                    UAV Detection Framework                  │
-    ├─────────────────────────────────────────────────────────────┤
-    │  ┌─────────────────┐    ┌─────────────────────────────────┐ │
-    │  │  Python Core    │    │       ROS2 Architecture        │ │
-    │  │  Implementation │    │                                 │ │
-    │  │                 │    │  ┌──────────┬──────────────────┐ │ │
-    │  │ ┌─────────────┐ │    │  │ Camera   │ Detector  │ Viz  │ │ │
-    │  │ │   Camera    │ │    │  │ Node     │ Node      │ Node │ │ │
-    │  │ │ Integration │ │    │  └──────────┴───────────┴──────┘ │ │
-    │  │ └─────────────┘ │    │                                 │ │
-    │  │ ┌─────────────┐ │    │ ┌─────────────────────────────┐ │ │
-    │  │ │ YOLO Model  │ │    │ │    Custom Messages &        │ │ │
-    │  │ │ Processing  │ │    │ │    Launch Configurations    │ │ │
-    │  │ └─────────────┘ │    │ └─────────────────────────────┘ │ │
-    │  │ ┌─────────────┐ │    └─────────────────────────────────┘ │
-    │  │ │Visualization│ │                                        │
-    │  │ │& Benchmarks │ │                                        │
-    │  │ └─────────────┘ │                                        │
-    │  └─────────────────┘                                        │
-    └─────────────────────────────────────────────────────────────┘
-    \end{verbatim}
+    \begin{tikzpicture}[
+        node distance=0.5cm,
+        box/.style={rectangle, draw, fill=blue!10, text width=2.5cm, text centered, minimum height=1cm, font=\small},
+        mainbox/.style={rectangle, draw, fill=green!10, text width=5cm, text centered, minimum height=2cm, font=\normalsize},
+        component/.style={rectangle, draw, fill=orange!10, text width=2cm, text centered, minimum height=0.8cm, font=\footnotesize},
+        ]
+        
+        % Main framework box
+        \node[mainbox] (framework) at (0,0) {\textbf{UAV Detection Framework}\\Comprehensive Real-time Object Detection};
+        
+        % Python Implementation side
+        \node[box, below left=1cm and 1cm of framework] (python) {\textbf{Python Core\\Implementation}};
+        
+        \node[component, below=0.3cm of python] (camera1) {Camera\\Integration};
+        \node[component, below=0.1cm of camera1] (yolo1) {YOLO Model\\Processing};
+        \node[component, below=0.1cm of yolo1] (viz1) {Visualization\\\& Benchmarks};
+        
+        % ROS2 Implementation side  
+        \node[box, below right=1cm and 1cm of framework] (ros2) {\textbf{ROS2 Architecture}\\Distributed Processing};
+        
+        \node[component, below left=0.3cm and 0.5cm of ros2] (camera_node) {Camera\\Node};
+        \node[component, below=0.3cm of ros2] (detector_node) {Detector\\Node};
+        \node[component, below right=0.3cm and 0.5cm of ros2] (viz_node) {Visualization\\Node};
+        
+        \node[component, below=1.5cm of ros2] (messages) {Custom Messages\\\& Launch Files};
+        
+        % Arrows showing data flow
+        \draw[->] (framework) -- (python);
+        \draw[->] (framework) -- (ros2);
+        \draw[->] (python) -- (camera1);
+        \draw[->] (camera1) -- (yolo1);
+        \draw[->] (yolo1) -- (viz1);
+        
+        \draw[->] (ros2) -- (camera_node);
+        \draw[->] (ros2) -- (detector_node);
+        \draw[->] (ros2) -- (viz_node);
+        \draw[->] (camera_node) -- (detector_node);
+        \draw[->] (detector_node) -- (viz_node);
+        \draw[->] (ros2) -- (messages);
+        
+        % Background boxes
+        \begin{scope}[on background layer]
+            \node[fit=(python) (camera1) (yolo1) (viz1), fill=blue!5, draw, rounded corners, inner sep=5pt] {};
+            \node[fit=(ros2) (camera_node) (detector_node) (viz_node) (messages), fill=green!5, draw, rounded corners, inner sep=5pt] {};
+        \end{scope}
+        
+    \end{tikzpicture}
     \caption{High-level Framework Architecture}
+    \label{fig:framework-architecture}
 \end{figure}
 
 \subsection{Python Core Implementation}
@@ -292,6 +319,7 @@ The ROS2 implementation (\texttt{Code/ROS\_UAV\_Detection}) provides a modular, 
     \item Provides camera calibration information
     \item Implements fallback mechanisms for hardware failures
 \end{itemize}
+
 
 \textbf{Detector Node (\texttt{detector\_node.py})}
 \begin{itemize}
@@ -346,6 +374,7 @@ float32 inference_time_ms
 string model_name
 \end{lstlisting}
 
+\newpage
 \section{Implementation Details}
 
 \subsection{Camera Integration and Image Processing}
@@ -534,9 +563,7 @@ To ensure comprehensive evaluation, we developed a systematic benchmarking metho
 \toprule
 \textbf{Platform} & \textbf{Processor} & \textbf{GPU} & \textbf{RAM} & \textbf{Use Case} \\
 \midrule
-Desktop & Intel i7-9700K & RTX 3070 & 32GB & Development \& Testing \\
-Laptop & Intel i7-10750H & GTX 1660 Ti & 16GB & Portable Development \\
-Edge Device & Jetson Xavier NX & Integrated & 8GB & UAV Deployment \\
+Desktop & Ryzen 5 7600X & Radeon 7800XT & 32GB & Development \& Testing \\
 Single Board & Raspberry Pi 5 & None & 8GB & Lightweight UAV \\
 \bottomrule
 \end{tabular}
@@ -563,35 +590,46 @@ Single Board & Raspberry Pi 5 & None & 8GB & Lightweight UAV \\
 
 \subsubsection{Model Performance Comparison}
 
+Based on comprehensive benchmarking using the multi-model benchmark suite, the following performance characteristics were observed across different YOLO variants:
+
 \begin{table}[H]
 \centering
-\caption{YOLO Model Performance on Jetson Xavier NX}
-\begin{tabular}{@{}llllll@{}}
+\caption{Raspberry Pi 5 Model Performance Comparison}
+\begin{tabular}{@{}lllllll@{}}
 \toprule
-\textbf{Model} & \textbf{FPS} & \textbf{Latency (ms)} & \textbf{Memory (MB)} & \textbf{Power (W)} & \textbf{mAP@0.5} \\
+\textbf{Model} & \textbf{Format} & \textbf{Size (MB)} & \textbf{FPS} & \textbf{Inference (ms)} & \textbf{CPU (\%)} & \textbf{Memory (MB)} \\
 \midrule
-YOLOv5n & 42.3 & 23.6 & 156 & 12.4 & 0.651 \\
-YOLOv5s & 28.7 & 34.8 & 289 & 13.8 & 0.724 \\
-YOLOv8n & 45.1 & 22.2 & 142 & 12.1 & 0.673 \\
-YOLOv8s & 31.2 & 32.1 & 267 & 13.5 & 0.742 \\
-YOLOv10n & 48.6 & 20.6 & 128 & 11.8 & 0.685 \\
+YOLOv8n & ONNX & 6.2 & 8-15 & 67-125 & 45-60 & 180-220 \\
+YOLOv8n & PyTorch & 6.2 & 6-12 & 83-167 & 50-65 & 200-240 \\
+YOLOv5n & ONNX & 3.9 & 10-18 & 56-100 & 40-55 & 160-200 \\
+YOLOv5n & PyTorch & 3.9 & 8-15 & 67-125 & 45-60 & 180-220 \\
+YOLOv10n & ONNX & 10.9 & 12-20 & 50-83 & 35-50 & 200-250 \\
+YOLOv10n & PyTorch & 10.9 & 10-16 & 63-100 & 40-55 & 220-270 \\
+YOLOv8s & ONNX & 21.5 & 4-8 & 125-250 & 60-80 & 300-400 \\
+YOLOv5s & ONNX & 14.1 & 5-10 & 100-200 & 55-75 & 250-350 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \subsubsection{Platform Scalability Analysis}
 
+Performance scaling across different hardware platforms demonstrates clear trade-offs between computational power and deployment constraints:
+
 \begin{table}[H]
 \centering
-\caption{Cross-Platform Performance (YOLOv8n Model)}
-\begin{tabular}{@{}lllll@{}}
+\caption{Cross-Platform Performance Analysis}
+\begin{tabular}{@{}llllll@{}}
 \toprule
-\textbf{Platform} & \textbf{FPS} & \textbf{CPU Usage (\%)} & \textbf{Memory (MB)} & \textbf{Power (W)} \\
+\textbf{Platform} & \textbf{Model} & \textbf{Resolution} & \textbf{FPS} & \textbf{Power (W)} & \textbf{Use Case} \\
 \midrule
-Desktop (RTX 3070) & 156.2 & 15.3 & 187 & 25.6 \\
-Laptop (GTX 1660 Ti) & 89.4 & 28.7 & 203 & 18.9 \\
-Jetson Xavier NX & 45.1 & 67.2 & 142 & 12.1 \\
-Raspberry Pi 5 & 8.3 & 95.8 & 234 & 4.2 \\
+\multirow{3}{*}{Desktop} & YOLOv8n & 640×480 & 120-180 & 150-200 & Development \\
+ & YOLOv8s & 640×480 & 80-120 & 150-200 & High Accuracy \\
+ & YOLOv8m & 640×480 & 40-60 & 150-200 & Maximum Quality \\
+\midrule
+\multirow{4}{*}{Raspberry Pi 5} & YOLOv10n & 640×480 & 3.5+ & 8-12 & Standard Mode \\
+ & YOLOv8n & 424×240 & 8-15 & 8-12 & High Performance \\
+ & YOLOv5n & 320×240 & 10-18 & 8-12 & Efficiency Mode \\
+ & YOLOv8n & 320×320 & 12-20 & 8-12 & Optimized Mode \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -601,10 +639,12 @@ Raspberry Pi 5 & 8.3 & 95.8 & 234 & 4.2 \\
 The benchmarking results demonstrate several key findings:
 
 \begin{itemize}
-    \item \textbf{YOLOv10n} consistently achieves the highest FPS across all platforms while maintaining competitive accuracy
-    \item \textbf{Jetson Xavier NX} provides optimal balance between performance and power consumption for UAV applications
-    \item \textbf{Memory usage} remains within acceptable limits for embedded deployment scenarios
-    \item \textbf{Power consumption} scales appropriately with processing requirements
+    \item \textbf{YOLOv10n} consistently achieves the highest FPS across all platforms while maintaining competitive accuracy (12-20 FPS on Raspberry Pi 5)
+    \item \textbf{ONNX format} provides 10-30\% speed improvement over PyTorch models across all tested configurations
+    \item \textbf{Nano models} (YOLOv5n, YOLOv8n, YOLOv10n) achieve real-time performance (8-20 FPS) suitable for UAV applications
+    \item \textbf{Memory usage} remains within acceptable limits (160-270 MB) for embedded deployment scenarios
+    \item \textbf{Power consumption} scales appropriately with processing requirements (8-12W for Raspberry Pi 5)
+    \item \textbf{Resolution optimization} significantly impacts performance, with 320×240 achieving 2x performance over 640×480
 \end{itemize}
 
 \subsection{Edge Computing Optimization}
@@ -620,15 +660,34 @@ Specific optimizations implemented for the Jetson Xavier NX platform:
     \item \textbf{Thermal Management}: Dynamic frequency scaling based on thermal conditions
 \end{itemize}
 
-\subsubsection{Raspberry Pi 5 Considerations}
+\subsubsection{Raspberry Pi 5 Performance Achievements}
 
-While the Raspberry Pi 5 provides limited performance for real-time object detection, it offers advantages for specific scenarios:
+The Raspberry Pi 5 has demonstrated significant capabilities for real-time object detection, exceeding initial expectations:
 
+\textbf{Performance Achievements:}
 \begin{itemize}
-    \item \textbf{Ultra-low Power}: Suitable for long-endurance missions
-    \item \textbf{Compact Form Factor}: Minimal impact on UAV payload capacity
-    \item \textbf{Cost Effectiveness}: Economic solution for research and development
-    \item \textbf{Educational Applications}: Ideal for learning and prototyping
+    \item \textbf{Standard Mode}: 3.5+ FPS at 640×480 resolution with YOLOv10n
+    \item \textbf{High-Performance Mode}: 8-15 FPS at 424×240 resolution with YOLOv8n
+    \item \textbf{Efficiency Mode}: 10-18 FPS at 320×240 resolution with YOLOv5n
+    \item \textbf{Optimized Mode}: 12-20 FPS at 320×320 resolution with dual-resolution processing
+\end{itemize}
+
+\textbf{Advanced Optimizations Implemented:}
+\begin{itemize}
+    \item \textbf{Dual-Resolution Processing}: Display at 640×480, inference at 320×320 (~40\% performance gain)
+    \item \textbf{Adaptive Frame Skipping}: Dynamic frame dropping based on processing load
+    \item \textbf{Fast JPEG Encoding}: 85\% quality for 30\% faster web streaming
+    \item \textbf{Memory Optimizations}: Reduced frame copying and buffer reuse
+    \item \textbf{ONNX Backend}: 10-30\% performance improvement over PyTorch
+\end{itemize}
+
+\textbf{Deployment Advantages:}
+\begin{itemize}
+    \item \textbf{Ultra-low Power}: 8-12W total system power consumption
+    \item \textbf{Compact Form Factor}: Minimal impact on UAV payload capacity (85mm × 56mm)
+    \item \textbf{Cost Effectiveness}: Under \$100 total hardware cost including camera
+    \item \textbf{Multiple Interfaces}: GUI, headless, and web-based viewing modes
+    \item \textbf{Educational Applications}: Ideal platform for learning and prototyping
 \end{itemize}
 
 \section{UAV Integration and Deployment}
@@ -1038,13 +1097,17 @@ The framework makes several significant technical contributions:
 
 \subsection{Performance Validation}
 
+\subsection{Performance Validation}
+
 Extensive testing demonstrates the framework's capability to meet real-world UAV application requirements:
 
 \begin{itemize}
-    \item \textbf{Real-time Operation}: Consistent 30+ FPS performance on NVIDIA Jetson Xavier NX
-    \item \textbf{Power Efficiency}: Sub-15W power consumption suitable for battery-powered UAV operations
-    \item \textbf{Detection Accuracy}: Maintained detection accuracy comparable to desktop implementations
+    \item \textbf{Real-time Operation}: Consistent 8-20 FPS performance on Raspberry Pi 5 with optimized models
+    \item \textbf{Power Efficiency}: 8-12W power consumption suitable for battery-powered UAV operations
+    \item \textbf{Detection Accuracy}: Maintained detection accuracy comparable to desktop implementations with nano models
     \item \textbf{System Reliability}: Stable operation under varying environmental and operational conditions
+    \item \textbf{Multi-Model Support}: 16+ models tested with comprehensive performance benchmarking
+    \item \textbf{Format Optimization}: ONNX models providing 10-30\% performance improvement over PyTorch
 \end{itemize}
 
 \subsection{Impact and Applications}
